@@ -47,6 +47,7 @@ func main() {
 			v.IsDebit = isDebit(s.ToLower(v.Body))
 			v.Cateogry = tagCategory(s.ToLower(v.Body))
 			v.Amount = getAmount(s.ToLower(v.Body))
+			v.Date = getDate(s.ToLower(v.Body))
 			log.Infof("%#v", v)
 		}
 
@@ -92,4 +93,11 @@ func getAmount(body string) float64 {
 		log.Info(err)
 	}
 	return a
+}
+
+func getDate(body string) string {
+	r, _ := regexp.Compile(`((\d{2}|\d)-([a-z]{3}|[a-z]+)-\d+)`)
+	values := r.FindAllString(body, -1)
+	log.Info(values)
+	return values[0]
 }
