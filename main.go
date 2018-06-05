@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 	s "strings"
 
 	log "github.com/sirupsen/logrus"
@@ -17,7 +18,8 @@ type Sms struct {
 	BankName      string
 	IsDebit       bool
 	Cateogry      string
-	Amount        string
+	Date          string
+	Amount        float64
 }
 
 type MainSms struct {
@@ -44,7 +46,8 @@ func main() {
 		if alert {
 			v.IsDebit = isDebit(s.ToLower(v.Body))
 			v.Cateogry = tagCategory(s.ToLower(v.Body))
-			log.Info(v)
+			v.Amount = getAmount(s.ToLower(v.Body))
+			log.Infof("%#v", v)
 		}
 
 	}
@@ -79,6 +82,14 @@ func tagCategory(body string) string {
 	return key
 }
 
-func getAmount() {
+//your acct \d+x+\d+[a-z\s]+(\d+\.?\d{0,2}) on (\d{2}-[a-z]{3}-\d+).*
 
+func getAmount(body string) float64 {
+	r, _ := regexp.Compile(`(((\d+,\d+))|\d+\.\d+)`)
+	values := r.FindAllString(body, -1)
+	a, err := strconv.ParseFloat(s.Replace(values[0], ",", "", -1), 64)
+	if err != nil {
+		log.Info(err)
+	}
+	return a
 }
