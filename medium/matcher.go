@@ -1,4 +1,4 @@
-package main
+package medium
 
 var (
 	BankNames = map[string]string{
@@ -27,5 +27,9 @@ var (
 		"online":        {"paystack", "flutterwave"},
 		"atm":           {"atm", "withdrawal"},
 		"transfer":      {"cr"},
+	}
+
+	Currency = map[string][]string{
+		"Naira": {"NGN", "N"},
 	}
 )

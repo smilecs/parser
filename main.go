@@ -1,37 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
-	"regexp"
-	"strconv"
-	s "strings"
+
+	"github.com/smilecs/parser/medium"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type Sms struct {
-	Body          string `xml:"body,attr"`
-	Subject       string `xml:"subject,attr"`
-	Address       string `xml:"address,attr"`
-	ServiceCenter string `xml:"service_center,attr"`
-	BankName      string
-	IsDebit       bool
-	Cateogry      string
-	Date          string
-	Amount        float64
-}
-
 type MainSms struct {
-	SmsTag []Sms `xml:"sms"`
+	SmsTag []medium.Sms `xml:"sms"`
 }
-
-const DEBIT = "debit"
 
 func main() {
 	//log.SetFormatter(&log.JSONFormatter{})
 	sms := MainSms{}
-	// newSmsList := []Sms{}
+	//	newSmsList := []medium.Sms{}
 	data, err := ioutil.ReadFile("./sms.xml")
 	if err != nil {
 		log.Println(err)
@@ -40,64 +26,33 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	for _, v := range sms.SmsTag {
-		alert, bankName := isAccountAlert(s.ToLower(v.Body))
+	//log.Infof("%#v", sms.SmsTag)
+	list := []medium.Sms{}
+	toParse, err := json.Marshal(sms.SmsTag)
+	if err == nil {
+		data := medium.GetAlertSmsList(toParse)
+		_ = json.Unmarshal(data, &list)
+		//log.Infof("%#v", list)
+	}
+	/*	for _, v := range sms.SmsTag {
+
+		alert, bankName := medium.IsAccountAlert(s.ToLower(v.Body))
 		v.BankName = bankName
 		if alert {
-			v.IsDebit = isDebit(s.ToLower(v.Body))
-			v.Cateogry = tagCategory(s.ToLower(v.Body))
-			v.Amount = getAmount(s.ToLower(v.Body))
-			v.Date = getDate(s.ToLower(v.Body))
+			v.BankName = v.Address
+			v.IsDebit = medium.IsDebit(s.ToLower(v.Body))
+			v.Cateogry = medium.TagCategory(s.ToLower(v.Body))
+			v.Amount = medium.GetAmount(s.ToLower(v.Body))
+			v.Date = medium.GetDate(s.ToLower(v.Body))
+			v.Currency = medium.GetCurrency(v.Body)
+			newSmsList = append(newSmsList, v)
 			log.Infof("%#v", v)
 		}
 
-	}
-}
-
-func isAccountAlert(value string) (bool, string) {
-	var bankName string
-	bankMatcher, _ := regexp.MatchString(`(\d{3}[A-Za-z]{4}\d{3})`, value)
-	for _, k := range BankNames {
-		if s.Contains(value, k) && bankMatcher {
-			bankName = k
-			break
-		}
-	}
-	return bankMatcher, bankName
-}
-
-func isDebit(body string) bool {
-	return s.Contains(body, DEBIT)
-}
-
-func tagCategory(body string) string {
-	var key = "other"
-	for k, v := range Categories {
-		for _, vv := range v {
-			if s.Contains(body, vv) {
-				key = k
-				break
-			}
-		}
-	}
-	return key
-}
-
-//your acct \d+x+\d+[a-z\s]+(\d+\.?\d{0,2}) on (\d{2}-[a-z]{3}-\d+).*
-
-func getAmount(body string) float64 {
-	r, _ := regexp.Compile(`(((\d+,\d+))|\d+\.\d+)`)
-	values := r.FindAllString(body, -1)
-	a, err := strconv.ParseFloat(s.Replace(values[0], ",", "", -1), 64)
+	}*/
+	parsed, _ := json.Marshal(list)
+	err = ioutil.WriteFile("smile.json", parsed, 0644)
 	if err != nil {
-		log.Info(err)
+		log.Error(err)
 	}
-	return a
-}
-
-func getDate(body string) string {
-	r, _ := regexp.Compile(`((\d{2}|\d)-([a-z]{3}|[a-z]+)-\d+)`)
-	values := r.FindAllString(body, -1)
-	log.Info(values)
-	return values[0]
 }
