@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ type MainSms struct {
 	SmsTag []medium.Sms `xml:"sms"`
 }
 
-func main() {
+func test() {
 	//log.SetFormatter(&log.JSONFormatter{})
 	sms := MainSms{}
 	//	newSmsList := []medium.Sms{}
