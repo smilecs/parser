@@ -1,21 +1,20 @@
-package test
+package main
 
 import (
 	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
 
-	"github.com/smilecs/parser/medium"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/smilecs/parser/smsparser"
 )
 
 type MainSms struct {
-	SmsTag []medium.Sms `xml:"sms"`
+	SmsTag []smsparser.Sms `xml:"sms"`
 }
 
-func test() {
-	//log.SetFormatter(&log.JSONFormatter{})
+func main() {
+	log.SetFormatter(&log.JSONFormatter{})
 	sms := MainSms{}
 	//	newSmsList := []medium.Sms{}
 	data, err := ioutil.ReadFile("./sms.xml")
@@ -27,12 +26,16 @@ func test() {
 		log.Println(err)
 	}
 	//log.Infof("%#v", sms.SmsTag)
-	list := []medium.Sms{}
-	toParse, err := json.Marshal(sms.SmsTag)
+	//list := []smsparser.Sms{}
+	//toParse, err := json.Marshal(sms.SmsTag)
 	if err == nil {
-		data := medium.GetAlertSmsList(toParse)
-		_ = json.Unmarshal(data, &list)
-		//log.Infof("%#v", list)
+		data := smsparser.GetAlertSmsList(sms.SmsTag)
+		log.Infof("%#v", data)
+		parsed, _ := json.Marshal(data)
+		err = ioutil.WriteFile("smile.json", parsed, 0644)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 	/*	for _, v := range sms.SmsTag {
 
@@ -50,9 +53,4 @@ func test() {
 		}
 
 	}*/
-	parsed, _ := json.Marshal(list)
-	err = ioutil.WriteFile("smile.json", parsed, 0644)
-	if err != nil {
-		log.Error(err)
-	}
 }

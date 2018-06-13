@@ -26,7 +26,7 @@ const DEBIT = "debit"
 func IsAccountAlert(value string) bool {
 	//var bankName string
 	bankMatcher, _ := regexp.MatchString(`(\d{3}[A-Za-z]{4}\d{3})`, value)
-	for _, k := range BankNames {
+	for _, k := range bankNames {
 		if s.Contains(value, k) && bankMatcher {
 			//bankName = k
 			break
@@ -41,7 +41,7 @@ func IsDebit(body string) bool {
 
 func TagCategory(body string) string {
 	var key = "other"
-	for k, v := range Categories {
+	for k, v := range categories {
 		for _, vv := range v {
 			if s.Contains(body, vv) {
 				key = k
@@ -70,7 +70,7 @@ func GetDate(body string) string {
 
 func GetCurrency(body string) string {
 	var key = "unknown"
-	for _, v := range Currency {
+	for _, v := range currency {
 		for _, vv := range v {
 			if s.Contains(body, vv) {
 				key = vv

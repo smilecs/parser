@@ -1,7 +1,7 @@
 package smsparser
 
 var (
-	BankNames = map[string]string{
+	bankNames = map[string]string{
 		"1":  "firstbank",
 		"2":  "fcmb",
 		"3":  "uba",
@@ -14,7 +14,7 @@ var (
 		"10": "alat",
 	}
 
-	Categories = map[string][]string{
+	categories = map[string][]string{
 		"eatery":        {"chicken republic", "sweet sensation", "uq restaurant", "kfc", "debonairs", "dominos", "cold stone"},
 		"leisure":       {"cinema", " game", "plaza", "beer hug"},
 		"transport":     {"uber", "taxify", "lyft", "uberm"},
@@ -29,7 +29,7 @@ var (
 		"transfer":      {"cr"},
 	}
 
-	Currency = map[string][]string{
+	currency = map[string][]string{
 		"Naira": {"NGN", "N"},
 	}
 )
